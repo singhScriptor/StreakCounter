@@ -1,7 +1,8 @@
+/* styles.css */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     height: 100vh;
     margin: 0;
@@ -16,13 +17,16 @@ body {
     100% { background-position: 0% 50%; }
 }
 
+.parent {
+    display: none;
+}
+
 .container {
     text-align: center;
     padding: 20px;
     border-radius: 12px;
     width: 90%;
-    max-width: 600px; /* Reduced max-width */
-    margin: 20px;
+    max-width: 800px;
 }
 
 .stats {
@@ -33,33 +37,29 @@ body {
 }
 
 .stat {
-    background: rgba(255, 255, 255, 0.7); /* Semi-transparent background */
-    padding: 10px; /* Reduced padding */
+    background: rgba(255, 255, 255, 0.7);
+    padding: 10px;
     border-radius: 12px;
     animation: fadeIn 1s ease-in-out;
     display: flex;
-    flex-direction: column; /* Set direction to column */
+    flex-direction: column;
     align-items: center;
     margin: 10px;
-    flex: 1 1 120px; /* Set a fixed width for each stat */
-    height: 150px; /* Fixed height for uniformity */
+    flex: 1 1 120px;
+    height: 150px;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .circle {
     position: relative;
-    width: 70px; /* Smaller circle size */
-    height: 70px; /* Smaller circle size */
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
-    overflow: hidden; /* Ensures the ring stays within the circle */
+    overflow: hidden;
 }
 
 .circle-ring {
@@ -71,6 +71,7 @@ body {
         rgba(255, 243, 224, 0.7) calc(var(--progress) * 1%)
     );
     position: absolute;
+    transition: background 0.5s ease;
 }
 
 #circle-total .circle-ring {
@@ -94,13 +95,22 @@ body {
     );
 }
 
+.circle::after {
+    content: '';
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+}
+
 @media (max-width: 600px) {
     .circle {
-        width: 50px; /* Smaller for mobile */
-        height: 50px; /* Smaller for mobile */
+        width: 50px;
+        height: 50px;
     }
-
-    .stat {
-        height: 130px; /* Adjusted for mobile */
+    .circle::after {
+        width: 40px;
+        height: 40px;
     }
 }

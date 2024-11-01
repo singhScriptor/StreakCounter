@@ -5,27 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GitHub Streak</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <div class="parent">
+        <div class="child">
+            <ul class="list">
+                <li class="list-item" data-id="1">Item 1</li>
+                <li class="list-item" data-id="2">
+                    Item 2
+                    <ul class="nested-list">
+                        <li class="nested-item" data-id="2a">Item 2a</li>
+                        <li class="nested-item" data-id="2b">Item 2b</li>
+                    </ul>
+                </li>
+                <li class="list-item" data-id="3">Item 3</li>
+            </ul>
+        </div>
+    </div>
     <div class="container">
+        <h1>GitHub Streak Calculator</h1>
         <div class="stats">
             <div class="stat" id="circle-total">
                 <div class="circle">
                     <div class="circle-ring" style="--progress: 0;"></div>
                 </div>
-                <p>Total Contributions:</p>
+                <p>Total Contributions: 0</p>
             </div>
             <div class="stat" id="circle-current">
                 <div class="circle">
                     <div class="circle-ring" style="--progress: 0;"></div>
+                    <i class="fas fa-fire" style="color: #ff7043;"></i>
                 </div>
-                <p>Current Streak:</p>
+                <p>Current Streak: 0</p>
             </div>
             <div class="stat" id="circle-longest">
                 <div class="circle">
                     <div class="circle-ring" style="--progress: 0;"></div>
                 </div>
-                <p>Longest Streak:</p>
+                <p>Longest Streak: 0</p>
             </div>
         </div>
     </div>

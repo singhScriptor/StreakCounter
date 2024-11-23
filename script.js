@@ -1,87 +1,127 @@
-async function fetchContributions(username) {
+document.getElementById('streak-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    if (username) {
+        console.log('Fetching stats for:', username);
+        getGitHubStats(username);
+    } else {
+        alert('Please enter a valid GitHub username.');
+    }
+});
+
+async function fetchRepos(username) {
     try {
-        const response = await fetch(`https://api.github.com/users/${username}/events/public`);
+        console.log('Fetching repositories for:', username);
+        const response = await fetch(`https://api.github.com/users/${username}/repos`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        return data;
+        const repos = await response.json();
+        console.log('Repositories fetched:', repos);
+        return repos.map(repo => repo.name);
     } catch (error) {
-        console.error("Error fetching contributions:", error);
+        console.error("Error fetching repos:", error);
         return [];
     }
 }
 
-function calculateStreaks(contributions) {
-    let total = 0;
+async function fetchCommits(username, repo) {
+    try {
+        console.log(`Fetching commits for repo: ${repo}`);
+        const response = await fetch(`https://api.github.com/repos/${username}/${repo}/commits?per_page=100`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const commits = await response.json();
+        console.log(`Commits fetched for repo: ${repo}`, commits);
+        return commits.map(commit => commit.commit.author.date.split('T')[0]);
+    } catch (error) {
+        console.error(`Error fetching commits for repo ${repo}:`, error);
+        return [];
+    }
+}
+
+async function fetchCommitData(username) {
+    try {
+        const repos = await fetchRepos(username);
+        let allCommitDates = [];
+        for (const repo of repos) {
+            const commitDates = await fetchCommits(username, repo);
+            allCommitDates = allCommitDates.concat(commitDates);
+        }
+        console.log('All commit dates fetched:', allCommitDates);
+        return allCommitDates;
+    } catch (error) {
+        console.error("Error fetching commit data:", error);
+        return [];
+    }
+}
+
+function calculateStreaks(dates) {
+    const uniqueDates = Array.from(new Set(dates)).sort();
+    let totalCommits = dates.length;
     let currentStreak = 0;
     let longestStreak = 0;
+    let tempStreak = 1;
+    let lastDate = new Date(uniqueDates[0]);
 
-    const validEvents = contributions.filter(event =>
-        event.type === 'PushEvent' ||
-        event.type === 'PullRequestEvent' ||
-        event.type === 'IssuesEvent'
-    );
-
-    console.log("Valid events count:", validEvents.length); // Debugging output
-
-    const contributionDates = new Set();
-    validEvents.forEach(event => {
-        const date = new Date(event.created_at).setHours(0, 0, 0, 0);
-        contributionDates.add(date);
-    });
-
-    console.log("Contribution dates:", Array.from(contributionDates)); // Debugging output
-
-    total = contributionDates.size;
-    const dates = Array.from(contributionDates).sort((a, b) => a - b);
-
-    let lastDate = null;
-    let tempStreak = 0;
-    dates.forEach(date => {
-        if (lastDate !== null) {
-            const difference = (date - lastDate) / (1000 * 60 * 60 * 24);
-            if (difference === 1) {
-                tempStreak++;
-            } else {
-                longestStreak = Math.max(longestStreak, tempStreak);
-                tempStreak = 1;
-            }
+    for (let i = 1; i < uniqueDates.length; i++) {
+        const currentDate = new Date(uniqueDates[i]);
+        const diffDays = (currentDate - lastDate) / (1000 * 60 * 60 * 24);
+        if (diffDays === 1) {
+            tempStreak++;
         } else {
+            longestStreak = Math.max(longestStreak, tempStreak);
             tempStreak = 1;
         }
-        lastDate = date;
-    });
+        lastDate = currentDate;
+    }
 
     currentStreak = tempStreak;
     longestStreak = Math.max(longestStreak, currentStreak);
 
-    return { total, currentStreak, longestStreak };
+    return { totalCommits, currentStreak, longestStreak };
 }
 
-function updateCircles(total, currentStreak, longestStreak) {
-    const circleTotal = document.querySelector('#circle-total .circle-ring');
-    const circleCurrent = document.querySelector('#circle-current .circle-ring');
-    const circleLongest = document.querySelector('#circle-longest .circle-ring');
+function updateUI(totalCommits, currentStreak, longestStreak) {
+    const totalCircle = document.querySelector('#circle-total');
+    const currentCircle = document.querySelector('#circle-current');
+    const longestCircle = document.querySelector('#circle-longest');
 
-    const totalPercent = total > 0 ? (total / 400) * 360 : 0;  // Assuming max contributions at 400 for the ring
-    const currentPercent = currentStreak > 0 ? (currentStreak / 30) * 360 : 0;  // Assuming max streak days at 30 for the ring
-    const longestPercent = longestStreak > 0 ? (longestStreak / 30) * 360 : 0;  // Same for the longest streak
+    if (totalCircle && currentCircle && longestCircle) {
+        console.log('Updating UI with:', totalCommits, currentStreak, longestStreak);
+        totalCircle.querySelector('p').textContent = `Total Contributions: ${totalCommits}`;
+        currentCircle.querySelector('p').textContent = `Current Streak: ${currentStreak}`;
+        longestCircle.querySelector('p').textContent = `Longest Streak: ${longestStreak}`;
 
-    circleTotal.style.setProperty('--progress', totalPercent);
-    circleCurrent.style.setProperty('--progress', currentPercent);
-    circleLongest.style.setProperty('--progress', longestPercent);
+        const totalPercent = totalCommits > 0 ? 360 : 0;
+        const currentPercent = currentStreak > 0 ? (currentStreak / 365) * 360 : 0;
+        const longestPercent = longestStreak > 0 ? (longestStreak / 365) * 360 : 0;
 
-    document.querySelector('#circle-total p').textContent = `Total Contributions: ${total}`;
-    document.querySelector('#circle-current p').textContent = `Current Streak: ${currentStreak}`;
-    document.querySelector('#circle-longest p').textContent = `Longest Streak: ${longestStreak}`;
+        totalCircle.querySelector('.circle-ring').style.setProperty('--progress', totalPercent);
+        currentCircle.querySelector('.circle-ring').style.setProperty('--progress', currentPercent);
+        longestCircle.querySelector('.circle-ring').style.setProperty('--progress', longestPercent);
+    } else {
+        console.error("UI elements not found");
+    }
 }
 
-async function updateStreak(username) {
-    const contributions = await fetchContributions(username);
-    const { total, currentStreak, longestStreak } = calculateStreaks(contributions);
-    updateCircles(total, currentStreak, longestStreak);
+async function getGitHubStats(username) {
+    try {
+        const commitDates = await fetchCommitData(username);
+        if (commitDates.length > 0) {
+            console.log('Commit Dates:', commitDates);
+            const { totalCommits, currentStreak, longestStreak } = calculateStreaks(commitDates);
+            console.log('Calculated Streaks:', { totalCommits, currentStreak, longestStreak });
+            updateUI(totalCommits, currentStreak, longestStreak);
+        } else {
+            updateUI(0, 0, 0);
+        }
+    } catch (error) {
+        console.error("Error updating streak:", error);
+        updateUI(0, 0, 0);
+    }
 }
 
-// Call the function with a specific username
-updateStreak('Dhirajkr08');
+// Initial state
+updateUI(0, 0, 0);

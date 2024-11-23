@@ -1,14 +1,15 @@
-/* styles.css */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
     height: 100vh;
     margin: 0;
-    background: linear-gradient(270deg, #e0f7fa, #ffccbc, #c8e6c9, #d1c4e9);
+    background: linear-gradient(270deg, #0f2027, #203a43, #2c5364);
     background-size: 600% 600%;
     animation: gradientAnimation 15s ease infinite;
+    min-height: 100vh; /* Ensure full height on small screens */
+    flex-direction: column; /* Allow for vertical stacking of content */
 }
 
 @keyframes gradientAnimation {
@@ -27,18 +28,37 @@ body {
     border-radius: 12px;
     width: 90%;
     max-width: 800px;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(120deg, #4158d0 0%, #c850c0 46%, #ffcc70 100%);
+    background-size: 600% 600%;
+    animation: gradientAnimation 15s ease infinite;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #fff;
+    width: 100%; /* Ensure full width */
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Prevent overflow */
+    text-overflow: ellipsis; /* Add ellipsis for overflow */
 }
 
 .stats {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center; /* Center content horizontally */
     margin-top: 20px;
 }
 
 .stat {
-    background: rgba(255, 255, 255, 0.7);
-    padding: 10px;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 20px;
     border-radius: 12px;
     animation: fadeIn 1s ease-in-out;
     display: flex;
@@ -47,6 +67,12 @@ body {
     margin: 10px;
     flex: 1 1 120px;
     height: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.stat:hover {
+    transform: translateY(-10px);
 }
 
 @keyframes fadeIn {
@@ -56,10 +82,11 @@ body {
 
 .circle {
     position: relative;
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .circle-ring {
@@ -97,14 +124,165 @@ body {
 
 .circle::after {
     content: '';
-    width: 60px;
-    height: 60px;
-    background: white;
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     position: absolute;
+    top: 5px;
+    left: 5px;
 }
 
+.circle i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: #ff7043;
+}
+
+p {
+    margin-top: 10px;
+    font-size: 1.1em;
+    color: #fff;
+}
+
+/* Input and Button Styling */
+input, button {
+    font-family: inherit;
+    padding: 12px;
+    margin: 5px 0;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input {
+    background-color: rgba(255, 255, 255, 0.7);
+    font-size: 1em; /* Increase font size for better readability */
+}
+
+button {
+    background-color: #437fff;
+    color: white;
+    font-size: 1.1em; /* Slightly larger font for better readability */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #078c60;
+}
+
+/* Footer styling */
+footer {
+    width: 100%;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .footer-content {
+    display: flex;
+    flex-direction: row; /* Change to column for vertical layout */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    max-width: 1200px;
+    width: 100%;
+  }
+  
+  .footer-content p {
+    margin: 20px;
+    color: white; /* Ensure copyright text is white */
+  }
+  
+  .footer-content .social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Space between social icons */
+  }
+  
+  .footer-content a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .footer-content a:hover {
+    color: #ddd;
+  }
+
+/* Media Queries for Small Screens */
 @media (max-width: 600px) {
+    .footer-content {
+        flex-direction: column; /* Stack content vertically on small screens */
+    }
+    
+    .footer-content p {
+        font-size: 0.8em; /* Reduce font size on small screens */
+        margin: 10px 0; /* Adjust margin to fit better on small screens */
+    }
+    
+    .footer-content .social-links {
+        gap: 15px; /* Reduce the space between social icons */
+    }
+}
+
+
+/* Media Queries for Small Screens */
+@media (max-width: 600px) {
+    body {
+        flex-direction: column; /* Allow content to stack vertically */
+        min-height: auto; /* Ensure content isn't constrained */
+    }
+    
+    .container {
+        width: 85%; /* Make container a bit smaller */
+        padding: 15px; /* Reduce padding */
+        overflow: auto; /* Ensure overflow is visible */
+    }
+    .circle {
+        width: 60px;
+        height: 60px;
+    }
+    .circle::after {
+        width: 50px;
+        height: 50px;
+    }
+    .stat {
+        padding: 15px;
+        height: 120px;
+        margin: 5px; /* Reduced margin for small screens */
+    }
+    p {
+        font-size: 0.9em; /* Adjust font size for small screens */
+    }
+    h1 {
+        font-size: 1.5em; /* Adjust font size for small screens */
+        white-space: normal; /* Allow text wrapping */
+        overflow: visible; /* Allow overflow */
+    }
+    input {
+        font-size: 1em; /* Increase font size for input */
+        padding: 10px; /* Adjust padding */
+    }
+    button {
+        font-size: 1.1em; /* Increase font size for button */
+        padding: 12px; /* Adjust padding */
+    }
+}
+
+@media (max-width: 445px) {
+    .stat {
+        flex: 1 1 100%; /* Full width on extra small screens */
+        height: auto; /* Adjust height */
+        margin: 5px 0; /* Adjust margin */
+    }
     .circle {
         width: 50px;
         height: 50px;
@@ -112,5 +290,16 @@ body {
     .circle::after {
         width: 40px;
         height: 40px;
+    }
+    h1 {
+        font-size: 1.2em; /* Further adjust font size for extra small screens */
+    }
+    input {
+        font-size: 1em; /* Increase font size for input */
+        padding: 10px; /* Adjust padding */
+    }
+    button {
+        font-size: 1.1em; /* Increase font size for button */
+        padding: 12px; /* Adjust padding */
     }
 }
